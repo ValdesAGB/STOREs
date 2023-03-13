@@ -112,3 +112,48 @@ export const LoadingProvider = ({ children }) => {
     </LoadingContext.Provider>
   )
 }
+
+export const UserContext = createContext()
+export const UserProvider = ({ children }) => {
+  const [lastName, setLastName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [mail, setMail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+
+  const UserInformations = {
+    lastName,
+    firstName,
+    mail,
+    password,
+    confirmPassword,
+  }
+  const [loginMail, setLoginMail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+
+  const loginInformations = {
+    loginMail,
+    loginPassword,
+  }
+
+  return (
+    <UserContext.Provider
+      value={{
+        setLastName,
+        setFirstName,
+        setMail,
+        setPassword,
+        setConfirmPassword,
+        setShowPassword,
+        showPassword,
+        UserInformations,
+        setLoginMail,
+        setLoginPassword,
+        loginInformations,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  )
+}

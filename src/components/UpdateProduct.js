@@ -168,7 +168,11 @@ function UpdateProduct() {
               </div>
 
               <button
-                className="btn btn-primary"
+                className={`btn btn-primary ${
+                  Object.values(ProductUpdate).every((value) => value !== '')
+                    ? null
+                    : 'disabled'
+                }`}
                 data-bs-target={`#updateproduct`}
                 data-bs-toggle="modal"
                 onClick={(e) => UpdateProduct(e)}

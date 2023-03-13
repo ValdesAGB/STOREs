@@ -124,7 +124,11 @@ function AddForm() {
             </div>
 
             <button
-              className="btn btn-primary"
+              className={`btn btn-primary ${
+                Object.values(ProductModel).every((value) => value !== '')
+                  ? null
+                  : 'disabled'
+              }`}
               onClick={(e) => AddNewProduct(e)}
             >
               Enrégister
