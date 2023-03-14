@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { LoadingContext, ProductContext } from '../untils/context'
+import { LoadingContext, ProductContext, UserContext } from '../untils/context'
 import { onLine } from '../untils/data'
 import { Loader } from '../untils/Loading'
 
@@ -8,6 +8,7 @@ function View() {
   const { id } = useParams()
   const { oneProduct, toggleOneProduct } = useContext(ProductContext)
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
+  const { userLogin } = useContext(UserContext)
 
   const fetchElements = {
     fetchUrl: `http://localhost:3001/api/product/${id}`,
@@ -16,20 +17,27 @@ function View() {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        //  Authorization: `Bearer ${LoginMessage.token}`,
+        Authorization: `Bearer ${
+          userLogin !== null ? userLogin.token : 'Error'
+        }`,
       },
     },
   }
 
   useEffect(() => {
     setIsDataLoading(true)
-    fetch(fetchElements.fetchUrl, fetchElements.fetchOptions)
-      .then((promise) => promise.json())
-      .then((product) => {
-        toggleOneProduct(product)
-        setIsDataLoading(false)
-      })
-      .catch((error) => console.log(error))
+    if (userLogin === null) {
+      alert('Veuillez vous connecter pour pouvoir voir plus')
+      window.location.pathname = '/login'
+    } else {
+      fetch(fetchElements.fetchUrl, fetchElements.fetchOptions)
+        .then((promise) => promise.json())
+        .then((product) => {
+          toggleOneProduct(product)
+          setIsDataLoading(false)
+        })
+        .catch((error) => console.log(error))
+    }
   }, [])
   return (
     <React.Fragment>
@@ -40,7 +48,7 @@ function View() {
           <Loader />
         ) : (
           <>
-            <div>
+            <div className={`${userLogin === null ? 'd-none' : null}`}>
               <div className="row align-items-center">
                 <h5 className="col-7 fw-light">
                   Nom du produit : {oneProduct.name}

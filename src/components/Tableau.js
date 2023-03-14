@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { LoadingContext, MessageContext, UserContext } from '../untils/context'
 import { disponible, indisponible, onLine } from '../untils/data'
+import { Loader } from '../untils/Loading'
+import Message from './Message'
 
 function Tableau({
   id,
@@ -13,13 +16,22 @@ function Tableau({
   createdAt,
   updatedAt,
 }) {
-  const userName = 'amphi'
-
   const TdStyled = styled.td`
     &:hover {
       cursor: pointer;
     }
   `
+
+  const { userLogin } = useContext(UserContext)
+
+  const { message, toggleMessage } = useContext(MessageContext)
+
+  const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
+
+  useEffect(() => {
+    toggleMessage('')
+  }, [])
+
   const fetchElements = {
     fetchDelete: {
       Url: `http://localhost:3001/api/product/${id}`,
@@ -28,19 +40,25 @@ function Tableau({
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
-          //  Authorization: `Bearer ${LoginMessage.token}`,
+          Authorization: `Bearer ${
+            userLogin !== null ? userLogin.token : 'Error'
+          }`,
         },
       },
     },
   }
 
   function DeleteProduct() {
+    setIsDataLoading(true)
     fetch(fetchElements.fetchDelete.Url, fetchElements.fetchDelete.Options)
       .then((promise) => promise.json())
       .then((message) => {
-        console.log(message)
-        alert(`"${name}" bien supprimé.!`)
-        window.location.pathname = `user/dashboard/${userName}`
+        toggleMessage(message)
+        setIsDataLoading(false)
+        alert(message.message)
+        window.location.pathname = `user/dashboard/${
+          userLogin && userLogin.userId
+        }`
       })
       .catch((error) => console.log(error))
   }
@@ -50,6 +68,8 @@ function Tableau({
       <tbody className="table-group-divider">
         {navigator.onLine === false ? (
           onLine
+        ) : isDataLoading ? (
+          <Loader />
         ) : (
           <>
             <tr>

@@ -50,3 +50,24 @@ export const deleteProduct = {
     },
   },
 }
+
+export const profilCover = (
+  <div
+    style={{
+      width: '50px',
+      height: '50px',
+      borderRadius: '50%',
+      objectFit: 'cover',
+    }}
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    <img
+      src="https://cours-informatique-gratuit.fr/wp-content/uploads/2014/05/compte-utilisateur-1.png"
+      alt="user"
+      className="w-100"
+      title="Dashboard"
+    />
+  </div>
+)

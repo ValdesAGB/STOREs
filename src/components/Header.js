@@ -1,14 +1,26 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
+import styled from 'styled-components'
+import { UserContext } from '../untils/context'
+import { profilCover } from '../untils/data'
 
 function Header() {
-  const user = localStorage.getItem('user')
-
+  const { userLogin } = useContext(UserContext)
   const storeName = 'MOONSTORE'
-  const userName = 'ampi'
-  console.log(
-    user === null ? 'Veuillez vous connecter' : 'voues etes connectez'
-  )
+
+  const Span = styled.span`
+    &:hover {
+      cursor: pointer;
+    }
+  `
+
+  function LogOut() {
+    localStorage.removeItem('user')
+    setTimeout(() => {
+      window.location.pathname = '/'
+    }, 1000)
+  }
+
   return (
     <React.Fragment>
       <div className="row p-2 mb-2 align-items-center  border border-dark rounded-2">
@@ -21,31 +33,38 @@ function Header() {
         </div>
 
         <div className="col-4 d-flex justify-content-end">
-          {user === null ? (
+          {userLogin === null ? (
             <Link to="/login">
               <button className="btn btn-primary fw-light">Connexion</button>
             </Link>
           ) : (
-            <Link
-              to={`user/dashboard/${userName}`}
-              className={navigator.onLine === false ? 'd-none' : null}
-            >
-              <div
-                style={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                }}
-              >
-                <img
-                  src="https://cours-informatique-gratuit.fr/wp-content/uploads/2014/05/compte-utilisateur-1.png"
-                  alt="user"
-                  className="w-100"
-                  title="Dashboard"
-                />
+            <>
+              <div className="dropdown-center">
+                {profilCover}
+
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link
+                      to={`user/dashboard/${userLogin && userLogin.userId}`}
+                      className={`text-decoration-none dropdown-item ${
+                        navigator.onLine === false ? 'd-none' : null
+                      }`}
+                    >
+                      Tableau de bord
+                    </Link>
+                  </li>
+
+                  <li className=" ">
+                    <Span
+                      className="dropdown-item border-top"
+                      onClick={() => LogOut()}
+                    >
+                      Déconnexion <i className="bi bi-box-arrow-in-right"></i>
+                    </Span>
+                  </li>
+                </ul>
               </div>
-            </Link>
+            </>
           )}
         </div>
       </div>

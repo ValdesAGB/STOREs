@@ -1,12 +1,17 @@
 import React, { useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { LoadingContext, ProductContext } from '../untils/context'
+import {
+  LoadingContext,
+  MessageContext,
+  ProductContext,
+  UserContext,
+} from '../untils/context'
 import { onLine, updateProduct } from '../untils/data'
 import { Loader } from '../untils/Loading'
+import Message from './Message'
 import Modal from './Modal'
 
 function UpdateProduct() {
-  const userName = 'ampi'
   const { id } = useParams()
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
   const {
@@ -19,7 +24,10 @@ function UpdateProduct() {
     setCoverProductToUpdate,
     setInStockProductToUpdate,
   } = useContext(ProductContext)
-  // const {message, toggleMessage,  } = useContext(MessageContext)
+
+  const { userLogin } = useContext(UserContext)
+
+  const { message, toggleMessage } = useContext(MessageContext)
 
   const fetchElements = {
     fetchUrl: `http://localhost:3001/api/product/${id}`,
@@ -28,7 +36,9 @@ function UpdateProduct() {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        //  Authorization: `Bearer ${LoginMessage.token}`,
+        Authorization: `Bearer ${
+          userLogin !== null ? userLogin.token : 'Error'
+        }`,
       },
     },
 
@@ -38,18 +48,20 @@ function UpdateProduct() {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        //  Authorization: `Bearer ${LoginMessage.token}`,
+        Authorization: `Bearer ${
+          userLogin !== null ? userLogin.token : 'Error'
+        }`,
       },
     },
   }
 
   useEffect(() => {
+    toggleMessage('')
     setIsDataLoading(true)
     fetch(fetchElements.fetchUrl, fetchElements.fetchGetOptions)
       .then((promise) => promise.json())
       .then((productToUpdate) => {
         toggleOneProductToUpdate(productToUpdate)
-
         setNameProductToUpdate(productToUpdate.name)
         setDescriptionProductToUpdate(productToUpdate.description)
         setPriceProductToUpdate(productToUpdate.price)
@@ -62,16 +74,18 @@ function UpdateProduct() {
 
   function UpdateProduct(e) {
     e.preventDefault()
+    setIsDataLoading(true)
     fetch(fetchElements.fetchUrl, fetchElements.fetchPutOptions)
       .then((promise) => promise.json())
       .then((message) => {
-        console.log(message)
+        toggleMessage(message)
+        setIsDataLoading(false)
       })
       .catch((error) => console.log(error))
   }
 
   function Redirect() {
-    window.location.pathname = `user/dashboard/${userName}`
+    window.location.pathname = `user/dashboard/${userLogin && userLogin.userId}`
   }
 
   return (
@@ -83,7 +97,7 @@ function UpdateProduct() {
           <Loader />
         ) : (
           <>
-            <form>
+            <form className={`${message === '' ? 'd-block' : 'd-none'}`}>
               <div className="mb-3">
                 <label htmlFor="name" className="form-label">
                   Nom du produit :
@@ -173,14 +187,16 @@ function UpdateProduct() {
                     ? null
                     : 'disabled'
                 }`}
-                data-bs-target={`#updateproduct`}
-                data-bs-toggle="modal"
+                /* data-bs-target={`#updateproduct`}
+                data-bs-toggle="modal"*/
                 onClick={(e) => UpdateProduct(e)}
               >
                 Mettre à jour
               </button>
             </form>
-            <Modal
+
+            <Message />
+            {/* <Modal
               fonctionFirstBtnModal={Redirect}
               firstModalBtnDataTarget={`updateproduct`}
               firstModalTitle={
@@ -195,7 +211,7 @@ function UpdateProduct() {
               }
               firstModalBtnClassName={'btn btn-primary'}
               firstModalBtn={`OK`}
-            />
+            />*/}
           </>
         )}
       </div>

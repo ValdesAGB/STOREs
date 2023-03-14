@@ -1,4 +1,5 @@
-const { createContext, useState } = require('react')
+const { createContext, useState, useEffect } = require('react')
+const user = localStorage.getItem('user')
 
 export const ProductContext = createContext()
 export const ProductProvider = ({ children }) => {
@@ -59,16 +60,15 @@ export const NewProductProvider = ({ children }) => {
   const [priceProduct, setPriceProduct] = useState(0)
   const [coverProduct, setCoverProduct] = useState('')
   const [inStockProduct, setInStockProduct] = useState(true)
+  const [userID, setUserID] = useState(user ? JSON.parse(user) : {})
 
-  // const [userID, setUserID] = useState(login ? JSON.parse(login) : {})
   const ProductModel = {
     name: nameProduct,
     description: descriptionProduct,
     price: priceProduct,
     cover: coverProduct,
     inStock: inStockProduct,
-    //date: time,
-    // userID: userID.userId,
+    userId: userID.userId,
   }
 
   return (
@@ -137,6 +137,17 @@ export const UserProvider = ({ children }) => {
     loginPassword,
   }
 
+  const [userLogin, setUserLogin] = useState(user ? JSON.parse(user) : null)
+
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (user) {
+      setUserLogin(JSON.parse(user))
+    }
+  }, [])
+
+  const [userProducts, setUserProducts] = useState([])
+
   return (
     <UserContext.Provider
       value={{
@@ -151,6 +162,9 @@ export const UserProvider = ({ children }) => {
         setLoginMail,
         setLoginPassword,
         loginInformations,
+        userLogin,
+        userProducts,
+        setUserProducts,
       }}
     >
       {children}

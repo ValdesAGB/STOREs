@@ -1,5 +1,7 @@
-import React, { useContext, useState } from 'react'
-import { UserContext } from '../untils/context'
+import React, { useContext, useEffect, useState } from 'react'
+import { LoadingContext, MessageContext, UserContext } from '../untils/context'
+import { Loader } from '../untils/Loading'
+import Message from './Message'
 
 function SignupForm() {
   const {
@@ -11,12 +13,20 @@ function SignupForm() {
     setShowPassword,
     UserInformations,
     showPassword,
+    userLogin,
   } = useContext(UserContext)
   const [onFocus, setOnFocus] = useState(false)
   const [masjuculeLetter, setMasjuculeLetter] = useState(false)
   const [specialCaractere, setSpecialCaractere] = useState(false)
   const [chiffre, setChiffre] = useState(false)
   const [nbreCaractere, setNbreCaractere] = useState(false)
+  const { message, toggleMessage } = useContext(MessageContext)
+
+  const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
+
+  useEffect(() => {
+    toggleMessage('')
+  }, [])
 
   function handleFocus() {
     setOnFocus(true)
@@ -65,6 +75,21 @@ function SignupForm() {
     }
   }
 
+  const fetchElements = {
+    fetchPost: {
+      url: `http://localhost:3001/api/auth/signup`,
+      options: {
+        method: 'POST',
+        body: JSON.stringify(UserInformations),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          //  Authorization: `Bearer ${LoginMessage.token}`,
+        },
+      },
+    },
+  }
+
   function Signup(e) {
     e.preventDefault()
     if (!checking) {
@@ -85,149 +110,154 @@ function SignupForm() {
       alert(`Votre mot de passe n'est pas assez fort.!`)
       return null
     }
-    const fetchElements = {
-      fetchPost: {
-        url: `http://localhost:3001/api/auth/signup`,
-        options: {
-          method: 'POST',
-          body: JSON.stringify(UserInformations),
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            //  Authorization: `Bearer ${LoginMessage.token}`,
-          },
-        },
-      },
-    }
 
+    setIsDataLoading(true)
     fetch(fetchElements.fetchPost.url, fetchElements.fetchPost.options)
       .then((promise) => promise.json())
       .then((message) => {
-        alert(message.message)
-        window.location.pathname = '/'
+        if (typeof message === 'object' && Object.keys(message).length >= 3) {
+          localStorage.setItem('user', JSON.stringify(message))
+          setIsDataLoading(false)
+          window.location.pathname = `/user/dashboard/${message.userId}`
+        } else {
+          toggleMessage(message)
+          setIsDataLoading(false)
+          return null
+        }
+        setIsDataLoading(false)
       })
       .catch((error) => console.log(error))
-
-    console.log(checking)
-    console.log(UserInformations)
   }
 
   return (
     <React.Fragment>
       <div className="col-6">
-        <form>
-          <div className="mb-3">
-            <label htmlFor="lastName" className="form-label">
-              Nom :
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="lastName"
-              aria-describedby="emailHelp"
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
+        {isDataLoading ? (
+          <Loader />
+        ) : (
+          <>
+            <form className={`${message === '' ? 'd-block' : 'd-none'}`}>
+              <div className="mb-3">
+                <label htmlFor="lastName" className="form-label">
+                  Nom :
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="lastName"
+                  aria-describedby="emailHelp"
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
 
-          <div className="mb-3">
-            <label htmlFor="firstName" className="form-label">
-              Prénom(s) :
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="firstName"
-              aria-describedby="emailHelp"
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </div>
+              <div className="mb-3">
+                <label htmlFor="firstName" className="form-label">
+                  Prénom(s) :
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="firstName"
+                  aria-describedby="emailHelp"
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
 
-          <div className="mb-3">
-            <label htmlFor="mail" className="form-label">
-              Adresse mail :
-            </label>
-            <input
-              type="email"
-              className="form-control"
-              id="mail"
-              aria-describedby="emailHelp"
-              onChange={(e) => setMail(e.target.value)}
-            />
-          </div>
+              <div className="mb-3">
+                <label htmlFor="mail" className="form-label">
+                  Adresse mail :
+                </label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="mail"
+                  aria-describedby="emailHelp"
+                  onChange={(e) => setMail(e.target.value)}
+                />
+              </div>
 
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Mot de passe :
-            </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className="form-control"
-              id="password"
-              onChange={(e) => handleInputChange(e.target.value)}
-              onFocus={() => handleFocus()}
-              onBlur={() => handleBlur()}
-            />
-            <div
-              className={`fw-light mt-2 ${onFocus ? 'd-block' : 'd-none'}`}
-              style={{ fontSize: '0.9em' }}
-            >
-              Votre mot de passe doit contenir au moins :
-              <ul>
-                <li className={nbreCaractere ? 'text-success' : 'text-danger'}>
-                  6 caractères alpha-numériques;
-                </li>
-                <li
-                  className={masjuculeLetter ? 'text-success' : 'text-danger'}
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">
+                  Mot de passe :
+                </label>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="form-control"
+                  id="password"
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  onFocus={() => handleFocus()}
+                  onBlur={() => handleBlur()}
+                />
+                <div
+                  className={`fw-light mt-2 ${onFocus ? 'd-block' : 'd-none'}`}
+                  style={{ fontSize: '0.9em' }}
                 >
-                  Une lettre majuscule ;
-                </li>
-                <li className={chiffre ? 'text-success' : 'text-danger'}>
-                  Un chiffre ;
-                </li>
-                <li
-                  className={specialCaractere ? 'text-success' : 'text-danger'}
-                >
-                  Un caractère spécial.
-                </li>
-              </ul>
-            </div>
-          </div>
+                  Votre mot de passe doit contenir au moins :
+                  <ul>
+                    <li
+                      className={nbreCaractere ? 'text-success' : 'text-danger'}
+                    >
+                      6 caractères alpha-numériques;
+                    </li>
+                    <li
+                      className={
+                        masjuculeLetter ? 'text-success' : 'text-danger'
+                      }
+                    >
+                      Une lettre majuscule ;
+                    </li>
+                    <li className={chiffre ? 'text-success' : 'text-danger'}>
+                      Un chiffre ;
+                    </li>
+                    <li
+                      className={
+                        specialCaractere ? 'text-success' : 'text-danger'
+                      }
+                    >
+                      Un caractère spécial.
+                    </li>
+                  </ul>
+                </div>
+              </div>
 
-          <div className="mb-3">
-            <label htmlFor="confirmPassword" className="form-label">
-              Confimer mot de passe :
-            </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className="form-control"
-              id="confirmPassword"
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
+              <div className="mb-3">
+                <label htmlFor="confirmPassword" className="form-label">
+                  Confimer mot de passe :
+                </label>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="form-control"
+                  id="confirmPassword"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
 
-          <div className="mb-3 form-check">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="showPassword"
-              onClick={(e) => setShowPassword(e.target.checked)}
-            />
-            <label className="form-check-label" htmlFor="showPassword">
-              Afficher le mot de passe
-            </label>
-          </div>
-          <button
-            type="submit"
-            className={`btn btn-primary ${
-              Object.values(UserInformations).every((value) => value !== '')
-                ? null
-                : 'disabled'
-            }`}
-            onClick={(e) => Signup(e)}
-          >
-            S'inscrire
-          </button>
-        </form>
+              <div className="mb-3 form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="showPassword"
+                  onClick={(e) => setShowPassword(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="showPassword">
+                  Afficher le mot de passe
+                </label>
+              </div>
+              <button
+                type="submit"
+                className={`btn btn-primary ${
+                  Object.values(UserInformations).every((value) => value !== '')
+                    ? null
+                    : 'disabled'
+                }`}
+                onClick={(e) => Signup(e)}
+              >
+                S'inscrire
+              </button>
+            </form>
+            <Message />
+          </>
+        )}
       </div>
     </React.Fragment>
   )

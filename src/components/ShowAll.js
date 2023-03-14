@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import { LoadingContext, ProductContext } from '../untils/context'
+import { LoadingContext, ProductContext, UserContext } from '../untils/context'
 import { onLine } from '../untils/data'
 import { Loader } from '../untils/Loading'
 import Card from './Card'
@@ -7,6 +7,7 @@ import Card from './Card'
 function ShowAll() {
   const { allProducts, toggleAllProducts } = useContext(ProductContext)
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
+  const { userLogin } = useContext(UserContext)
 
   const fetchElements = {
     fetchUrl: `http://localhost:3001/api/product`,
@@ -15,7 +16,9 @@ function ShowAll() {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        //  Authorization: `Bearer ${LoginMessage.token}`,
+        Authorization: `Bearer ${
+          userLogin !== null ? userLogin.token : 'Error'
+        }`,
       },
     },
   }
@@ -33,15 +36,14 @@ function ShowAll() {
 
   return (
     <React.Fragment>
-      <div className="container row ">
+      <div className="container row justify-content-center">
         {navigator.onLine === false && onLine}
 
         {isDataLoading ? (
           <Loader />
-        ) : navigator.onLine && allProducts.length === 0 ? (
+        ) : allProducts.length === 0 ? (
           <div> 'Aucun produit pour le moment'</div>
         ) : (
-          navigator.onLine &&
           allProducts.map(
             ({ _id, name, description, cover, price, inStock }) => (
               <Card
