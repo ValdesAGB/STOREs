@@ -22,7 +22,14 @@ function AddForm() {
     setInStockProduct,
   } = useContext(NewProductContext)
 
-  const { message, toggleMessage } = useContext(MessageContext) // J'ai pas utiliser message pour afficher le message
+  const {
+    message,
+    toggleMessage,
+    errorMes,
+    toggleErrorMes,
+    codeErr,
+    setCodeErr,
+  } = useContext(MessageContext)
 
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
 
@@ -44,20 +51,35 @@ function AddForm() {
   }
 
   function AddNewProduct(e) {
-    toggleMessage('')
-    setIsDataLoading(true)
     e.preventDefault()
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
+    setIsDataLoading(true)
     fetch(fetchElements.fetchPost.url, fetchElements.fetchPost.options)
-      .then((promise) => promise.json())
+      .then((promise) => {
+        if (!promise.ok) {
+          throw promise
+        } else {
+          return promise.json()
+        }
+      })
       .then((message) => {
         toggleMessage(message)
-
         setIsDataLoading(false)
-        /* window.location.pathname = `user/dashboard/${
-          userLogin && userLogin.userId
-        }`*/
+        setTimeout(() => {
+          window.location.pathname = `user/dashboard/${
+            userLogin && userLogin.userId
+          }`
+        }, 3000)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        error.json().then((errorMessage) => {
+          toggleErrorMes(errorMessage.error)
+          setCodeErr(error.status)
+          setIsDataLoading(false)
+        })
+      })
   }
   return (
     <React.Fragment>
@@ -68,91 +90,93 @@ function AddForm() {
           <Loader />
         ) : (
           <>
-            <form className={`${message === '' ? 'd-block' : 'd-none'}`}>
-              <div className="mb-3">
-                <label htmlFor="name" className="form-label">
-                  Nom du produit :
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="name"
-                  aria-describedby="emailHelp"
-                  required
-                  onChange={(e) => setNameProduct(e.target.value)}
-                />
-              </div>
+            {message || errorMes ? null : (
+              <form>
+                <div className="mb-3">
+                  <label htmlFor="name" className="form-label">
+                    Nom du produit :
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="name"
+                    aria-describedby="emailHelp"
+                    required
+                    onChange={(e) => setNameProduct(e.target.value)}
+                  />
+                </div>
 
-              <div className="mb-3">
-                <label htmlFor="description" className="form-label">
-                  Description du produit :
-                </label>
-                <textarea
-                  className="form-control"
-                  placeholder="...."
-                  id="description"
-                  onChange={(e) => setDescriptionProduct(e.target.value)}
-                ></textarea>
-              </div>
+                <div className="mb-3">
+                  <label htmlFor="description" className="form-label">
+                    Description du produit :
+                  </label>
+                  <textarea
+                    className="form-control"
+                    placeholder="...."
+                    id="description"
+                    onChange={(e) => setDescriptionProduct(e.target.value)}
+                  ></textarea>
+                </div>
 
-              <div className="mb-3">
-                <label htmlFor="price" className="form-label">
-                  Prix du produit (€)
-                </label>
-                <input
-                  type="number"
-                  className="form-control"
-                  id="price"
-                  onChange={(e) => setPriceProduct(e.target.value)}
-                />
-              </div>
+                <div className="mb-3">
+                  <label htmlFor="price" className="form-label">
+                    Prix du produit (€)
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="price"
+                    onChange={(e) => setPriceProduct(e.target.value)}
+                  />
+                </div>
 
-              <div className="mb-3">
-                <label htmlFor="cover" className="form-label">
-                  Image du produit :
-                </label>
+                <div className="mb-3">
+                  <label htmlFor="cover" className="form-label">
+                    Image du produit :
+                  </label>
 
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  id="cover"
-                  placeholder="https://..."
-                  onChange={(e) => setCoverProduct(e.target.value)}
-                />
+                  <input
+                    type="text"
+                    className="form-control mb-2"
+                    id="cover"
+                    placeholder="https://..."
+                    onChange={(e) => setCoverProduct(e.target.value)}
+                  />
 
-                <input
-                  type="file"
-                  className="form-control col-6"
-                  id="cover"
-                  onChange={(e) => setCoverProduct(e.target.value)}
-                />
-              </div>
+                  <input
+                    type="file"
+                    className="form-control col-6"
+                    id="cover"
+                    onChange={(e) => setCoverProduct(e.target.value)}
+                  />
+                </div>
 
-              <div className="form-check form-switch my-3  fs-5">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  id="inStock"
-                  defaultChecked={inStockProduct}
-                  onChange={(e) => setInStockProduct(e.target.checked)}
-                />
-                <label className="form-check-label" htmlFor="inStock">
-                  Disponible actuellement.?
-                </label>
-              </div>
+                <div className="form-check form-switch my-3  fs-5">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="inStock"
+                    defaultChecked={inStockProduct}
+                    onChange={(e) => setInStockProduct(e.target.checked)}
+                  />
+                  <label className="form-check-label" htmlFor="inStock">
+                    Disponible actuellement.?
+                  </label>
+                </div>
 
-              <button
-                className={`btn btn-primary ${
-                  Object.values(ProductModel).every((value) => value !== '')
-                    ? null
-                    : 'disabled'
-                }`}
-                onClick={(e) => AddNewProduct(e)}
-              >
-                Enrégister
-              </button>
-            </form>
+                <button
+                  className={`btn btn-primary ${
+                    Object.values(ProductModel).every((value) => value !== '')
+                      ? null
+                      : 'disabled'
+                  }`}
+                  onClick={(e) => AddNewProduct(e)}
+                >
+                  Enrégister
+                </button>
+              </form>
+            )}
 
             <Message />
           </>

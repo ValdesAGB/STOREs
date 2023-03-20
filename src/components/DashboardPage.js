@@ -16,9 +16,17 @@ function DashboardPage() {
   const { userProducts, setUserProducts } = useContext(UserContext)
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
 
+  const {
+    message,
+    toggleMessage,
+    errorMes,
+    toggleErrorMes,
+    codeErr,
+    setCodeErr,
+  } = useContext(MessageContext) // J'ai pas utiliser message pour afficher le message
+
   var now = new Date()
   var hours = now.getHours()
-  const { message, toggleMessage } = useContext(MessageContext) // J'ai pas utiliser message pour afficher le message
 
   const fetchElements = {
     fetchUrl: `http://localhost:3001/api/user/product/${id}`,

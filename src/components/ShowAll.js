@@ -1,8 +1,14 @@
 import React, { useContext, useEffect } from 'react'
-import { LoadingContext, ProductContext, UserContext } from '../untils/context'
+import {
+  LoadingContext,
+  MessageContext,
+  ProductContext,
+  UserContext,
+} from '../untils/context'
 import { onLine } from '../untils/data'
 import { Loader } from '../untils/Loading'
 import Card from './Card'
+import Message from './Message'
 
 function ShowAll() {
   const { allProducts, toggleAllProducts } = useContext(ProductContext)
@@ -22,43 +28,70 @@ function ShowAll() {
       },
     },
   }
+  const {
+    message,
+    toggleMessage,
+    errorMes,
+    toggleErrorMes,
+    codeErr,
+    setCodeErr,
+  } = useContext(MessageContext)
 
   useEffect(() => {
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
     setIsDataLoading(true)
     fetch(fetchElements.fetchUrl, fetchElements.fetchOptions)
-      .then((promise) => promise.json())
+      .then((promise) => {
+        if (!promise.ok) {
+          throw promise
+        } else {
+          return promise.json()
+        }
+      })
       .then((productsList) => {
         toggleAllProducts(productsList)
         setIsDataLoading(false)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        error.json().then((errorMessage) => {
+          toggleErrorMes(errorMessage.error)
+          setCodeErr(error.status)
+          setIsDataLoading(false)
+        })
+      })
   }, [])
 
   return (
     <React.Fragment>
-      <div className="container row justify-content-center">
-        {navigator.onLine === false && onLine}
-
-        {isDataLoading ? (
-          <Loader />
-        ) : allProducts.length === 0 ? (
-          <div> 'Aucun produit pour le moment'</div>
-        ) : (
-          allProducts.map(
-            ({ _id, name, description, cover, price, inStock }) => (
-              <Card
-                key={_id}
-                id={_id}
-                name={name}
-                description={description}
-                cover={cover}
-                price={price}
-                inStock={inStock}
-              />
+      {message || errorMes ? null : (
+        <div className="container row justify-content-center">
+          {navigator.onLine === false ? (
+            onLine
+          ) : isDataLoading ? (
+            <Loader />
+          ) : allProducts.length === 0 ? (
+            <div> 'Aucun produit pour le moment'</div>
+          ) : (
+            allProducts.map(
+              ({ _id, name, description, cover, price, inStock }) => (
+                <Card
+                  key={_id}
+                  id={_id}
+                  name={name}
+                  description={description}
+                  cover={cover}
+                  price={price}
+                  inStock={inStock}
+                />
+              )
             )
-          )
-        )}
-      </div>
+          )}
+        </div>
+      )}
+
+      <Message />
     </React.Fragment>
   )
 }

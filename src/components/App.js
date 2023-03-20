@@ -4,6 +4,7 @@ import AddNewProduct from '../pages/AddNewProduct'
 import Dashboard from '../pages/Dashboard'
 import Home from '../pages/Home'
 import Login from '../pages/Login'
+import Parameters from '../pages/Parameters'
 import Signup from '../pages/Signup'
 import Update from '../pages/Update'
 import View from '../pages/View'
@@ -33,6 +34,10 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/login" element={<Login />} />
+                    <Route
+                      path="/user/parameters/:id"
+                      element={<Parameters />}
+                    />
                     <Route path="/newproduct" element={<AddNewProduct />} />
                     <Route path="product/viewmore/:id" element={<ViewMore />} />
                     <Route path="user/dashboard/:id" element={<Dashboard />} />

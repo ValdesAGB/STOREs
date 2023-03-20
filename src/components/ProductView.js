@@ -12,11 +12,17 @@ import Message from './Message'
 
 function ProductView() {
   const { id } = useParams()
-  console.log(id)
   const { oneProduct, toggleOneProduct } = useContext(ProductContext)
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
   const { userLogin } = useContext(UserContext)
-  const { message, toggleMessage } = useContext(MessageContext)
+  const {
+    message,
+    toggleMessage,
+    errorMes,
+    toggleErrorMes,
+    codeErr,
+    setCodeErr,
+  } = useContext(MessageContext)
 
   const fetchElements = {
     fetchGet: {
@@ -49,21 +55,44 @@ function ProductView() {
   }
 
   useEffect(() => {
-    toggleMessage('')
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
     setIsDataLoading(true)
     fetch(fetchElements.fetchGet.Url, fetchElements.fetchGet.Options)
-      .then((promise) => promise.json())
+      .then((promise) => {
+        if (!promise.ok) {
+          throw promise
+        } else {
+          return promise.json()
+        }
+      })
       .then((productsList) => {
         toggleOneProduct(productsList)
         setIsDataLoading(false)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        error.json().then((errorMessage) => {
+          toggleErrorMes(errorMessage.error)
+          setCodeErr(error.status)
+          setIsDataLoading(false)
+        })
+      })
   }, [])
 
   function DeleteProduct() {
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
     setIsDataLoading(true)
     fetch(fetchElements.fetchDelete.Url, fetchElements.fetchDelete.Options)
-      .then((promise) => promise.json())
+      .then((promise) => {
+        if (!promise.ok) {
+          throw promise
+        } else {
+          return promise.json()
+        }
+      })
       .then((message) => {
         toggleMessage(message)
         setIsDataLoading(false)
@@ -72,7 +101,13 @@ function ProductView() {
           userLogin && userLogin.userId
         }`*/
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        error.json().then((errorMessage) => {
+          toggleErrorMes(errorMessage.error)
+          setCodeErr(error.status)
+          setIsDataLoading(false)
+        })
+      })
   }
 
   return (
@@ -84,46 +119,51 @@ function ProductView() {
           <Loader />
         ) : (
           <>
-            <div className={`${message === '' ? 'd-block' : 'd-none'}`}>
+            {message || errorMes ? null : (
               <div>
-                <div className="row align-items-center">
-                  <h5 className="col fw-light">
-                    Nom du produit : {oneProduct.name}
-                  </h5>
-                  <h5 className="col d-flex justify-content-end fw-light">
-                    Prix du produit : {oneProduct.price} €
-                  </h5>
-                </div>
-                <div className="my-4">
-                  <img
-                    src={oneProduct.cover}
-                    alt={`${oneProduct.name}-cover`}
-                    className="w-100"
-                  />
-                </div>
+                <div>
+                  <div className="row align-items-center">
+                    <h5 className="col fw-light">
+                      Nom du produit : {oneProduct.name}
+                    </h5>
+                    <h5 className="col d-flex justify-content-end fw-light">
+                      Prix du produit : {oneProduct.price} €
+                    </h5>
+                  </div>
+                  <div className="my-4">
+                    <img
+                      src={oneProduct.cover}
+                      alt={`${oneProduct.name}-cover`}
+                      className="w-100"
+                    />
+                  </div>
 
-                <div className="border my-2">
-                  <p className="p-1 w-100 text-break">
-                    {oneProduct.description}
-                  </p>
-                </div>
+                  <div className="border my-2">
+                    <p className="p-1 w-100 text-break">
+                      {oneProduct.description}
+                    </p>
+                  </div>
 
-                <div className="my-2 d-flex justify-content-end">
-                  <h5> {oneProduct.inStock ? disponible : indisponible}</h5>
+                  <div className="my-2 d-flex justify-content-end">
+                    <h5> {oneProduct.inStock ? disponible : indisponible}</h5>
+                  </div>
+                </div>
+                <div>
+                  <Link
+                    to={`/update/product/${id}`}
+                    className="btn btn-success"
+                  >
+                    Modifier
+                  </Link>
+                  <button
+                    className="btn btn-danger offset-1"
+                    onClick={() => DeleteProduct()}
+                  >
+                    Supprimer
+                  </button>
                 </div>
               </div>
-              <div>
-                <Link to={`/update/product/${id}`} className="btn btn-success">
-                  Modifier
-                </Link>
-                <button
-                  className="btn btn-danger offset-1"
-                  onClick={() => DeleteProduct()}
-                >
-                  Supprimer
-                </button>
-              </div>
-            </div>
+            )}
             <Message />
           </>
         )}

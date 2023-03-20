@@ -16,6 +16,7 @@ function Header() {
 
   function LogOut() {
     localStorage.removeItem('user')
+    alert('Vous êtes entrain de vous déconnecté. Appuyez sur OK.')
     setTimeout(() => {
       window.location.pathname = '/'
     }, 1000)
@@ -51,6 +52,17 @@ function Header() {
                       }`}
                     >
                       Tableau de bord
+                    </Link>
+                  </li>
+
+                  <li>
+                    <Link
+                      to={`user/parameters/${userLogin && userLogin.userId}`}
+                      className={`text-decoration-none dropdown-item ${
+                        navigator.onLine === false ? 'd-none' : null
+                      }`}
+                    >
+                      Paramètres
                     </Link>
                   </li>
 

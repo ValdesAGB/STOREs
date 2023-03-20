@@ -90,13 +90,30 @@ export const NewProductProvider = ({ children }) => {
 
 export const MessageContext = createContext()
 export const MessageProvider = ({ children }) => {
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState(null)
+  const [errorMes, setErrorMes] = useState(null)
+  const [codeErr, setCodeErr] = useState(null)
+
   const toggleMessage = (mes) => {
     setMessage(mes)
   }
 
+  const toggleErrorMes = (err) => {
+    setErrorMes(err)
+  }
+
   return (
-    <MessageContext.Provider value={{ message, toggleMessage, setMessage }}>
+    <MessageContext.Provider
+      value={{
+        message,
+        toggleMessage,
+        setMessage,
+        errorMes,
+        toggleErrorMes,
+        codeErr,
+        setCodeErr,
+      }}
+    >
       {children}
     </MessageContext.Provider>
   )
@@ -147,6 +164,10 @@ export const UserProvider = ({ children }) => {
   }, [])
 
   const [userProducts, setUserProducts] = useState([])
+  const [userInformations, setUserInformations] = useState({})
+  const toggleUserInformations = (infos) => {
+    setUserInformations(infos)
+  }
 
   return (
     <UserContext.Provider
@@ -165,6 +186,8 @@ export const UserProvider = ({ children }) => {
         userLogin,
         userProducts,
         setUserProducts,
+        userInformations,
+        toggleUserInformations,
       }}
     >
       {children}
