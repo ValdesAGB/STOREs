@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import {
   LoadingContext,
   MessageContext,
@@ -49,6 +49,12 @@ function AddForm() {
       },
     },
   }
+
+  useEffect(() => {
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
+  }, [])
 
   function AddNewProduct(e) {
     e.preventDefault()
@@ -143,12 +149,12 @@ function AddForm() {
                     onChange={(e) => setCoverProduct(e.target.value)}
                   />
 
-                  <input
+                  {/* <input
                     type="file"
                     className="form-control col-6"
                     id="cover"
                     onChange={(e) => setCoverProduct(e.target.value)}
-                  />
+                  />*/}
                 </div>
 
                 <div className="form-check form-switch my-3  fs-5">

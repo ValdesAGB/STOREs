@@ -58,7 +58,7 @@ export const NewProductProvider = ({ children }) => {
   const [nameProduct, setNameProduct] = useState('')
   const [descriptionProduct, setDescriptionProduct] = useState('')
   const [priceProduct, setPriceProduct] = useState(0)
-  const [coverProduct, setCoverProduct] = useState('')
+  const [coverProduct, setCoverProduct] = useState(null)
   const [inStockProduct, setInStockProduct] = useState(true)
   const [userID, setUserID] = useState(user ? JSON.parse(user) : {})
 
@@ -93,6 +93,7 @@ export const MessageProvider = ({ children }) => {
   const [message, setMessage] = useState(null)
   const [errorMes, setErrorMes] = useState(null)
   const [codeErr, setCodeErr] = useState(null)
+  const [confirm, setConfirm] = useState(null)
 
   const toggleMessage = (mes) => {
     setMessage(mes)
@@ -100,6 +101,10 @@ export const MessageProvider = ({ children }) => {
 
   const toggleErrorMes = (err) => {
     setErrorMes(err)
+  }
+
+  const toggleConfirm = (conf) => {
+    setConfirm(conf)
   }
 
   return (
@@ -112,6 +117,8 @@ export const MessageProvider = ({ children }) => {
         toggleErrorMes,
         codeErr,
         setCodeErr,
+        confirm,
+        toggleConfirm,
       }}
     >
       {children}

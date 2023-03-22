@@ -1,17 +1,11 @@
 import React, { useContext, useEffect } from 'react'
-import {
-  LoadingContext,
-  MessageContext,
-  ProductContext,
-  UserContext,
-} from '../untils/context'
-import { onLine } from '../untils/data'
+import { useParams } from 'react-router-dom'
+import { LoadingContext, MessageContext, UserContext } from '../untils/context'
 import { Loader } from '../untils/Loading'
-import Card from './Card'
 import Message from './Message'
 
-function ShowAll() {
-  const { allProducts, toggleAllProducts } = useContext(ProductContext)
+function ConfirmAccount() {
+  const { token } = useParams()
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
   const { userLogin } = useContext(UserContext)
   const {
@@ -21,10 +15,12 @@ function ShowAll() {
     toggleErrorMes,
     codeErr,
     setCodeErr,
+    confirm,
+    toggleConfirm,
   } = useContext(MessageContext)
 
   const fetchElements = {
-    fetchUrl: `http://localhost:3001/api/product`,
+    fetchUrl: `http://localhost:3001/api/auth/confirmacount/${token}`,
     fetchOptions: {
       method: 'GET',
       headers: {
@@ -50,9 +46,14 @@ function ShowAll() {
           return promise.json()
         }
       })
-      .then((productsList) => {
-        toggleAllProducts(productsList)
+      .then((confirm) => {
+        toggleMessage(confirm)
         setIsDataLoading(false)
+        /*setTimeout(() => {
+          window.location.pathname = `/user/dashboard/${
+            userLogin && userLogin.userId
+          }`
+        }, 2000)*/
       })
       .catch((error) => {
         error.json().then((errorMessage) => {
@@ -65,35 +66,16 @@ function ShowAll() {
 
   return (
     <React.Fragment>
-      {message || errorMes ? null : (
-        <div className="container row justify-content-center">
-          {navigator.onLine === false ? (
-            onLine
-          ) : isDataLoading ? (
-            <Loader />
-          ) : allProducts.length === 0 ? (
-            <div> 'Aucun produit pour le moment'</div>
-          ) : (
-            allProducts.map(
-              ({ _id, name, description, cover, price, inStock }) => (
-                <Card
-                  key={_id}
-                  id={_id}
-                  name={name}
-                  description={description}
-                  cover={cover}
-                  price={price}
-                  inStock={inStock}
-                />
-              )
-            )
-          )}
-        </div>
+      {isDataLoading ? (
+        <Loader />
+      ) : message || errorMes ? null : (
+        <>
+          <div>Patientez un instant.... </div>
+        </>
       )}
-
       <Message />
     </React.Fragment>
   )
 }
 
-export default ShowAll
+export default ConfirmAccount

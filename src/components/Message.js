@@ -18,14 +18,16 @@ function Message() {
               ? message.error
               : errorMes}
           </div>
-          <span className={userLogin ? 'd-block' : 'd-none'}>
-            <Link
-              to={`/user/dashboard/${userLogin && userLogin.userId}`}
-              className="fw-light"
-            >
-              Tableau de bord
-            </Link>
-          </span>
+          {codeErr === 401 ? null : (
+            <span className={userLogin ? 'd-block' : 'd-none'}>
+              <Link
+                to={`/user/dashboard/${userLogin && userLogin.userId}`}
+                className="fw-light"
+              >
+                Tableau de bord
+              </Link>
+            </span>
+          )}
         </div>
       ) : null}
     </React.Fragment>

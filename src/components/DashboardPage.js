@@ -8,6 +8,7 @@ import {
 } from '../untils/context'
 import { onLine } from '../untils/data'
 import { Loader } from '../untils/Loading'
+import Message from './Message'
 import Tableau from './Tableau'
 
 function DashboardPage() {
@@ -43,15 +44,29 @@ function DashboardPage() {
   }
 
   useEffect(() => {
-    toggleMessage('')
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
     setIsDataLoading(true)
     fetch(fetchElements.fetchUrl, fetchElements.fetchOptions)
-      .then((promise) => promise.json())
+      .then((promise) => {
+        if (!promise.ok) {
+          throw promise
+        } else {
+          return promise.json()
+        }
+      })
       .then((productsList) => {
         setUserProducts(productsList)
         setIsDataLoading(false)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        error.json().then((errorMessage) => {
+          toggleErrorMes(errorMessage.error)
+          setCodeErr(error.status)
+          setIsDataLoading(false)
+        })
+      })
   }, [])
 
   return (
@@ -59,6 +74,8 @@ function DashboardPage() {
       <div>
         {navigator.onLine === false ? (
           onLine
+        ) : message || errorMes ? (
+          <Message />
         ) : (
           <>
             <div className="my-4">
@@ -115,9 +132,7 @@ function DashboardPage() {
                 )}
                 {isDataLoading ? (
                   <Loader />
-                ) : (
-                  userLogin &&
-                  userProducts !== null &&
+                ) : userLogin && userProducts !== null ? (
                   userProducts.map(
                     ({
                       _id,
@@ -142,7 +157,7 @@ function DashboardPage() {
                       />
                     )
                   )
-                )}
+                ) : null}
               </table>
             </div>
           </>
