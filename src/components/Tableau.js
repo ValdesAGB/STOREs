@@ -24,17 +24,26 @@ function Tableau({
 
   const { userLogin } = useContext(UserContext)
 
-  const { message, toggleMessage } = useContext(MessageContext)
+  const {
+    message,
+    toggleMessage,
+    errorMes,
+    toggleErrorMes,
+    codeErr,
+    setCodeErr,
+  } = useContext(MessageContext)
 
   const { isDataLoading, setIsDataLoading } = useContext(LoadingContext)
 
   useEffect(() => {
-    toggleMessage('')
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
   }, [])
 
   const fetchElements = {
     fetchDelete: {
-      Url: `http://localhost:3001/api/product/${id}`,
+      Url: `https://store-api-app-moonstore.herokuapp.com/api/product/${id}`,
       Options: {
         method: 'DELETE',
         headers: {
@@ -49,20 +58,45 @@ function Tableau({
   }
 
   function DeleteProduct() {
+    toggleMessage(null)
+    toggleErrorMes(null)
+    setCodeErr(null)
     setIsDataLoading(true)
     fetch(fetchElements.fetchDelete.Url, fetchElements.fetchDelete.Options)
-      .then((promise) => promise.json())
+      .then((promise) => {
+        if (!promise.ok) {
+          throw promise
+        } else {
+          return promise.json()
+        }
+      })
       .then((message) => {
         toggleMessage(message)
         setIsDataLoading(false)
-        alert(message.message)
-        window.location.pathname = `user/dashboard/${
+        // alert(message.message)
+        setTimeout(() => {
+          alert(
+            "Appuyer sur OK  et patientez le temps d'être rediriger vers votre tableau de bord."
+          )
+        }, 1000)
+        setTimeout(() => {
+          window.location.pathname = `user/dashboard/${
+            userLogin && userLogin.userId
+          }`
+        }, 3000)
+        /*  window.location.pathname = `user/dashboard/${
           userLogin && userLogin.userId
-        }`
+        }`*/
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        error.json().then((errorMessage) => {
+          toggleErrorMes(errorMessage.error)
+          setCodeErr(error.status)
+          setIsDataLoading(false)
+        })
+      })
+    console.log(message)
   }
-
   return (
     <React.Fragment>
       <tbody className="table-group-divider">
@@ -70,11 +104,13 @@ function Tableau({
           onLine
         ) : isDataLoading ? (
           <Loader />
+        ) : message || errorMes ? (
+          <Message />
         ) : (
           <>
             <tr>
               <th scope="row">{id.slice(0, 6) + '...'}</th>
-              <td>{name}</td>
+              <td>{name.slice(0, 10) + '...'}</td>
               <td>{description.slice(0, 10) + '...'}</td>
               <td>{price.toLocaleString('fr-FR')}</td>
               <td>{cover.slice(0, 20) + '...'}</td>

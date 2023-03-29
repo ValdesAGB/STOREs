@@ -87,7 +87,7 @@ function SignupForm() {
 
   const fetchElements = {
     fetchPost: {
-      url: `http://localhost:3001/api/auth/signup`,
+      url: `https://store-api-app-moonstore.herokuapp.com/api/auth/signup`,
       options: {
         method: 'POST',
         body: JSON.stringify(UserInformations),

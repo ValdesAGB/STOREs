@@ -24,7 +24,7 @@ function ShowAll() {
   } = useContext(MessageContext)
 
   const fetchElements = {
-    fetchUrl: `http://localhost:3001/api/product`,
+    fetchUrl: `https://store-api-app-moonstore.herokuapp.com/api/product`,
     fetchOptions: {
       method: 'GET',
       headers: {

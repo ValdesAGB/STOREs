@@ -19,7 +19,7 @@ function Params() {
   } = useContext(MessageContext)
 
   const fetchElements = {
-    fetchUrl: `http://localhost:3001/api/auth/informations/${id}`,
+    fetchUrl: `https://store-api-app-moonstore.herokuapp.com/api/auth/informations/${id}`,
     fetchOptions: {
       method: 'GET',
       headers: {
@@ -69,9 +69,7 @@ function Params() {
                   <th scope="col">Nom</th>
                   <th scope="col">Prénoms</th>
                   <th scope="col">Mail</th>
-                  {userInformations.stateAccount ? (
-                    <th scope="col">Etat compte</th>
-                  ) : null}
+
                   <th scope="col">Mot de passe</th>
                 </tr>
               </thead>
@@ -98,23 +96,7 @@ function Params() {
                       userInformations && userInformations.mail
                     )}
                   </td>
-                  {userInformations.stateAccount ? (
-                    <td>
-                      {isDataLoading ? (
-                        <Loader />
-                      ) : userInformations && userInformations.stateAccount ? (
-                        'Activé ✔'
-                      ) : userLogin.url ? (
-                        <Link
-                          to={`/confirm${userLogin.url.split('confirm')[1]}`}
-                          className="fw-bold text-dark text-decoration-none"
-                          title="Cliquez pour activer votre compte."
-                        >
-                          Non activé 😑
-                        </Link>
-                      ) : null}
-                    </td>
-                  ) : null}
+
                   <td>
                     {isDataLoading ? (
                       <Loader />

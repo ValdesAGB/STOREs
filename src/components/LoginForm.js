@@ -25,7 +25,7 @@ function LoginForm() {
 
   const fetchElements = {
     fetchPost: {
-      url: `http://localhost:3001/api/auth/login`,
+      url: `https://store-api-app-moonstore.herokuapp.com/api/auth/login`,
       options: {
         method: 'POST',
         body: JSON.stringify(loginInformations),

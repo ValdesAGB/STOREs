@@ -37,7 +37,7 @@ function UpdateProduct() {
   } = useContext(MessageContext)
 
   const fetchElements = {
-    fetchUrl: `http://localhost:3001/api/product/${id}`,
+    fetchUrl: `https://store-api-app-moonstore.herokuapp.com/api/product/${id}`,
     fetchGetOptions: {
       method: 'GET',
       headers: {
@@ -201,12 +201,12 @@ function UpdateProduct() {
                       onChange={(e) => setCoverProductToUpdate(e.target.value)}
                     />
 
-                    <input
+                    {/*<input
                       type="file"
                       className="form-control col-6"
                       id="cover"
                       onChange={(e) => setCoverProductToUpdate(e.target.value)}
-                    />
+                    />*/}
                   </div>
 
                   <div className="form-check form-switch my-3  fs-5">

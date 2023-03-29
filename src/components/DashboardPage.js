@@ -30,7 +30,7 @@ function DashboardPage() {
   var hours = now.getHours()
 
   const fetchElements = {
-    fetchUrl: `http://localhost:3001/api/user/product/${id}`,
+    fetchUrl: `https://store-api-app-moonstore.herokuapp.com/api/user/product/${id}`,
     fetchOptions: {
       method: 'GET',
       headers: {

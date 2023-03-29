@@ -35,7 +35,7 @@ function AddForm() {
 
   const fetchElements = {
     fetchPost: {
-      url: `http://localhost:3001/api/product`,
+      url: `https://store-api-app-moonstore.herokuapp.com/api/product`,
       options: {
         method: 'POST',
         body: JSON.stringify(ProductModel),

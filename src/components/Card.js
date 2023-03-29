@@ -30,7 +30,7 @@ function Card({ id, name, description, cover, price, inStock }) {
           <div className="">
             <img
               src={cover}
-              className="card-img-top"
+              className="card-img-top w-100"
               style={{ width: '270px', height: '170px' }}
               alt={`${name}-cover`}
             />

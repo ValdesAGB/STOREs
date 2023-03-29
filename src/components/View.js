@@ -25,7 +25,7 @@ function View() {
   } = useContext(MessageContext)
 
   const fetchElements = {
-    fetchUrl: `http://localhost:3001/api/product/${id}`,
+    fetchUrl: `https://store-api-app-moonstore.herokuapp.com/api/product/${id}`,
     fetchOptions: {
       method: 'GET',
       headers: {

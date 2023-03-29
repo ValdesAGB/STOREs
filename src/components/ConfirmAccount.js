@@ -20,7 +20,7 @@ function ConfirmAccount() {
   } = useContext(MessageContext)
 
   const fetchElements = {
-    fetchUrl: `http://localhost:3001/api/auth/confirmacount/${token}`,
+    fetchUrl: `https://store-api-app-moonstore.herokuapp.com/api/auth/confirmacount/${token}`,
     fetchOptions: {
       method: 'GET',
       headers: {

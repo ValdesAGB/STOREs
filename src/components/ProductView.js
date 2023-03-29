@@ -26,7 +26,7 @@ function ProductView() {
 
   const fetchElements = {
     fetchGet: {
-      Url: `http://localhost:3001/api/product/${id}`,
+      Url: `https://store-api-app-moonstore.herokuapp.com/api/product/${id}`,
       Options: {
         method: 'GET',
         headers: {
@@ -40,7 +40,7 @@ function ProductView() {
     },
 
     fetchDelete: {
-      Url: `http://localhost:3001/api/product/${id}`,
+      Url: `https://store-api-app-moonstore.herokuapp.com/api/product/${id}`,
       Options: {
         method: 'DELETE',
         headers: {
